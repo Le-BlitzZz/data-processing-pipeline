@@ -8,25 +8,15 @@ import (
 
 type Config struct {
 	mb *broker.MessageBroker
-
-	rawExchange       string
-	processedExchange string
-	datasetsDir       string
-	splits            []string
 }
 
 func NewConfig() (*Config, error) {
-	c := &Config{
-		rawExchange:       rawExchange,
-		processedExchange: processedExchange,
-		datasetsDir:       datasetsDir,
-		splits:            splits,
-	}
+	c := &Config{}
 
 	mbConfig := broker.NewConfig(
-		mbUser,
-		mbPassword,
-		mbServer,
+		c.BrokerUser(),
+		c.BrokerPassword(),
+		c.BrokerServer(),
 	)
 
 	mb, err := broker.NewMessageBroker(mbConfig)

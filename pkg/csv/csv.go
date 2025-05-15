@@ -8,8 +8,9 @@ import (
 )
 
 type HandlerFunc func(headers, record []string)
+type ErrorFunc func(error)
 
-func ForEachRow(filePath string, fn HandlerFunc) error {
+func ForEachRow(filePath string, callback HandlerFunc, onError ErrorFunc) error {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return fmt.Errorf("open %s: %w", filePath, err)
@@ -32,9 +33,10 @@ func ForEachRow(filePath string, fn HandlerFunc) error {
 		}
 
 		if err != nil {
+			onError(err)
 			continue
 		}
 
-		fn(headers, record)
+		callback(headers, record)
 	}
 }

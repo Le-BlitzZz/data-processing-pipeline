@@ -27,12 +27,14 @@ func main() {
 	}
 }
 
-func run(c *cli.Context) error {
+func run(ctx *cli.Context) error {
 	conf, err := config.NewConfig()
 	if err != nil {
 		return err
 	}
 	defer conf.Shutdown()
 
-	return producer.Run(conf)
+	producer.Run(conf)
+
+	return nil
 }

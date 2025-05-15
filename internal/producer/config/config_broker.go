@@ -9,16 +9,10 @@ const (
 	mbServer   = "rabbitmq:5672"
 	mbUser     = "etlstream"
 	mbPassword = "etlstream"
+
+	mbRawExchange       = "raw_exchange"
+	mbProcessedExchange = "processed_exchange"
 )
-
-const (
-	rawExchange       = "raw_exchange"
-	processedExchange = "processed_exchange"
-)
-
-const datasetsDir = "datasets"
-
-var splits = []string{"train", "test", "val"}
 
 func (c *Config) Mb() *broker.MessageBroker {
 	if c.mb == nil {
@@ -28,18 +22,22 @@ func (c *Config) Mb() *broker.MessageBroker {
 	return c.mb
 }
 
+func (c *Config) BrokerUser() string {
+	return mbUser
+}
+
+func (c *Config) BrokerPassword() string {
+	return mbPassword
+}
+
+func (c *Config) BrokerServer() string {
+	return mbServer
+}
+
 func (c *Config) RawExchange() string {
-	return c.rawExchange
+	return mbRawExchange
 }
 
 func (c *Config) ProcessedExchange() string {
-	return c.processedExchange
-}
-
-func (c *Config) DatasetsDir() string {
-	return c.datasetsDir
-}
-
-func (c *Config) Splits() []string {
-	return c.splits
+	return mbProcessedExchange
 }

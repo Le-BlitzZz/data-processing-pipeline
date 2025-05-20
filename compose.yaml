@@ -1,0 +1,75 @@
+services:
+  producer:
+    build: .
+    depends_on:
+      - rabbitmq
+    working_dir: "/go/src/github.com/Le-BlitzZz/streaming-etl-app/"
+    volumes:
+      - "./:/go/src/github.com/Le-BlitzZz/streaming-etl-app"
+      - "go-mod:/go/pkg/mod"
+
+  uploader:
+    build: .
+    depends_on:
+      - rabbitmq
+      - mariadb
+    ports:
+    - "8080:8080" # HTTP ports
+    working_dir: "/go/src/github.com/Le-BlitzZz/streaming-etl-app/"
+    volumes:
+      - "./:/go/src/github.com/Le-BlitzZz/streaming-etl-app"
+      - "go-mod:/go/pkg/mod"
+
+  # processor:
+  #   build:
+  #     context: .
+  #     dockerfile: cmd/processor/Dockerfile
+  #   depends_on:
+  #     - rabbitmq
+  #   working_dir: "/app"
+  #   volumes:
+  #     - "./processor:/app"
+
+  # presenter:
+  #   build: .
+  #   depends_on:
+  #     - mariadb
+  #   ports:
+  #     - "8081:8081" # HTTP ports
+  #   working_dir: "/go/src/github.com/Le-BlitzZz/streaming-etl-app/"
+  #   volumes:
+  #     - "./:/go/src/github.com/Le-BlitzZz/streaming-etl-app"
+  #     - "go-mod:/go/pkg/mod"
+      
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"  # RabbitMQ management UI
+      - "5672:5672"    # RabbitMQ AMQP protocol
+    environment:
+      RABBITMQ_DEFAULT_USER: etlstream
+      RABBITMQ_DEFAULT_PASS: etlstream
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  mariadb:
+    image: mariadb:11
+    command: --port=4001 --innodb-strict-mode=1 --innodb-buffer-pool-size=256M --transaction-isolation=READ-COMMITTED --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=512 --innodb-rollback-on-timeout=OFF --innodb-lock-wait-timeout=120
+    expose:
+      - "4001"
+    ports:
+      - "4001:4001"
+    volumes:
+      - "mariadb:/var/lib/mysql"
+    environment:
+      MARIADB_DATABASE: "etlstream"
+      MARIADB_USER: "etlstream"
+      MARIADB_PASSWORD: "etlstream"
+      MARIADB_ROOT_PASSWORD: "etlstream"
+
+volumes:
+  go-mod:
+    driver: local
+  rabbitmq_data:
+  mariadb:
+    driver: local

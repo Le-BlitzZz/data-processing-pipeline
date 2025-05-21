@@ -12,13 +12,13 @@ func Run(conf *config.Config) {
 
 	publisher, err := newPublisher(conf.Broker(), conf.BrokerRawExchange())
 	if err != nil {
-		log.Fatalf("failed to create raw publisher: %s", err)
+		log.Fatalf("failed to create publisher for raw messages: %s", err)
 	}
 	rawPublisher = publisher
 
 	publisher, err = newPublisher(conf.Broker(), conf.BrokerProcessedExchange())
 	if err != nil {
-		log.Fatalf("failed to create processed publisher: %s", err)
+		log.Fatalf("failed to create publisher for processing raw messages: %s", err)
 	}
 	processedPublisher = publisher
 

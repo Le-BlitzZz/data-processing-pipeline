@@ -53,6 +53,7 @@ func newPublisher(broker *rabbitmq.Conn, exchange string) (*rabbitmq.Publisher, 
 		rabbitmq.WithPublisherOptionsExchangeDeclare,
 		rabbitmq.WithPublisherOptionsExchangeKind("fanout"),
 		rabbitmq.WithPublisherOptionsLogger(log.StandardLogger()),
+		rabbitmq.WithPublisherOptionsExchangeDurable,
 	)
 }
 

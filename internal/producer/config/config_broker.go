@@ -13,8 +13,8 @@ const (
 	brokerUser     = "etlstream"
 	brokerPassword = "etlstream"
 
-	brokerRawExchange       = "raw_exchange"
-	brokerProcessedExchange = "processed_exchange"
+	brokerRawExchange           = "raw_exchange"
+	brokerRawProcessingExchange = "raw_processing_exchange"
 )
 
 func (c *Config) Broker() *rabbitmq.Conn {
@@ -54,10 +54,10 @@ func (c *Config) BrokerRawExchange() string {
 }
 
 func (c *Config) BrokerProcessedExchange() string {
-	if c.options.BrokerProcessedExchange == "" {
-		return brokerProcessedExchange
+	if c.options.BrokerRawProcessingExchange == "" {
+		return brokerRawProcessingExchange
 	}
-	return c.options.BrokerProcessedExchange
+	return c.options.BrokerRawProcessingExchange
 }
 
 func (c *Config) BrokerDsn() string {
@@ -89,6 +89,8 @@ func (c *Config) connectBroker() error {
 			return err
 		}
 	}
+
+	log.Info("RabbitMQ: connection established")
 
 	c.broker = broker
 

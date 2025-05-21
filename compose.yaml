@@ -20,15 +20,15 @@ services:
       - "./:/go/src/github.com/Le-BlitzZz/streaming-etl-app"
       - "go-mod:/go/pkg/mod"
 
-  # processor:
-  #   build:
-  #     context: .
-  #     dockerfile: cmd/processor/Dockerfile
-  #   depends_on:
-  #     - rabbitmq
-  #   working_dir: "/app"
-  #   volumes:
-  #     - "./processor:/app"
+  processor:
+    build:
+      context: .
+      dockerfile: processor/Dockerfile
+    depends_on:
+      - rabbitmq
+    working_dir: "/app"
+    volumes:
+      - "./processor:/app"
 
   # presenter:
   #   build: .

@@ -1,3 +1,6 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
 # Ignore temporary build files, dependencies, logs, and test output:
 /bin
 
@@ -6,3 +9,6 @@
 .DS_Store?
 .idea
 .vscode
+
+# Environments
+.venv*

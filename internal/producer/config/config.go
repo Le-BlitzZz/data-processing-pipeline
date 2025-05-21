@@ -1,40 +1,34 @@
 package config
 
 import (
-	"Le-BlitzZz/streaming-etl-app/internal/broker"
-
 	log "github.com/sirupsen/logrus"
+	"github.com/urfave/cli/v2"
+	"github.com/wagslane/go-rabbitmq"
 )
 
 type Config struct {
-	mb *broker.MessageBroker
+	options *Options
+	broker  *rabbitmq.Conn
 }
 
-func NewConfig() (*Config, error) {
-	c := &Config{}
+func NewConfig(ctx *cli.Context) (*Config, error) {
+	c := &Config{
+		options: NewOptions(ctx),
+	}
 
-	mbConfig := broker.NewConfig(
-		c.BrokerUser(),
-		c.BrokerPassword(),
-		c.BrokerServer(),
-	)
-
-	mb, err := broker.NewMessageBroker(mbConfig)
-	if err != nil {
+	if err := c.connectBroker(); err != nil {
 		return nil, err
 	}
 
-	c.mb = mb
-
-	log.Debug("config: successfully initialized")
+	log.Info("config: successfully initialized")
 
 	return c, nil
 }
 
 func (c *Config) Shutdown() {
-	if err := c.mb.Close(); err != nil {
+	if err := c.closeBroker(); err != nil {
 		log.Errorf("could not close message broker connection: %s", err)
 	} else {
-		log.Debug("closed message broker connection")
+		log.Info("closed message broker connection")
 	}
 }

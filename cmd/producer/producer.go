@@ -1,8 +1,8 @@
 package main
 
 import (
-	"Le-BlitzZz/streaming-etl-app/internal/producer"
 	"Le-BlitzZz/streaming-etl-app/internal/producer/config"
+	"Le-BlitzZz/streaming-etl-app/internal/producer/publishers"
 	"os"
 
 	log "github.com/sirupsen/logrus"
@@ -28,13 +28,14 @@ func main() {
 }
 
 func run(ctx *cli.Context) error {
-	conf, err := config.NewConfig()
+	conf, err := config.NewConfig(ctx)
 	if err != nil {
 		return err
 	}
-	defer conf.Shutdown()
 
-	producer.Run(conf)
+	publishers.Run(conf)
+
+	conf.Shutdown()
 
 	return nil
 }

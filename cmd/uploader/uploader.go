@@ -1,10 +1,14 @@
 package main
 
 import (
-	"Le-BlitzZz/streaming-etl-app/internal/entity"
 	"Le-BlitzZz/streaming-etl-app/internal/uploader/config"
-	"encoding/json"
+	"Le-BlitzZz/streaming-etl-app/internal/uploader/consumers"
+	"Le-BlitzZz/streaming-etl-app/internal/uploader/server"
+	"context"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -28,63 +32,28 @@ func main() {
 	}
 }
 
-func run(cli *cli.Context) error {
-	conf, err := config.NewConfig()
+func run(ctx *cli.Context) error {
+	conf, err := config.NewConfig(ctx)
 	if err != nil {
 		return err
 	}
 	defer conf.Shutdown()
 
-	conf.Db().Init()
+	cctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTSTP)
 
-	mb := conf.Mb()
+	conf.InitDb()
 
-	if err := mb.DeclareExchange(conf.RawExchange()); err != nil {
-		return err
-	}
+	go server.Start(cctx, conf)
 
-	// if err := mb.DeclareExchange(conf.ProcessedExchange()); err != nil {
-	// 	return err
-	// }
+	go consumers.Start(cctx, conf)
 
-	q, err := mb.DeclareQueue(conf.RawQueue())
-	if err != nil {
-		return err
-	}
+	<-cctx.Done()
 
-	if err := mb.BindQueue(q.Name, conf.RawExchange()); err != nil {
-		return err
-	}
+	log.Info("shutting down...")
+	cancel()
 
-	deliveries, err := mb.Consume(q.Name)
-	if err != nil {
-		return err
-	}
-	for d := range deliveries {
-		if err := processRawPayload(conf, d.Body); err != nil {
-			d.Nack(false, true)
-		} else {
-			d.Ack(true)
-		}
-	}
+	time.Sleep(2 * time.Second)
+	conf.Shutdown()
 
 	return nil
 }
-
-func processRawPayload(conf *config.Config, data []byte) error {
-	rawApartment := &entity.RawApartment{}
-	if err := json.Unmarshal(data, rawApartment); err != nil {
-		return err
-	}
-
-	return conf.Db().Create(rawApartment)
-}
-
-// func processProcessedPayload(conf *config.Config, data []byte) error {
-// 	processedApartment := &entity.ProcessedApartment{}
-// 	if err := json.Unmarshal(data, processedApartment); err != nil {
-// 		return err
-// 	}
-
-// 	return conf.Db().Create(processedApartment)
-// }

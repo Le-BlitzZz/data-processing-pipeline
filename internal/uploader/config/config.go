@@ -1,68 +1,50 @@
 package config
 
 import (
-	"Le-BlitzZz/streaming-etl-app/internal/broker"
-	"Le-BlitzZz/streaming-etl-app/internal/database"
-
 	log "github.com/sirupsen/logrus"
+	"github.com/urfave/cli/v2"
+	"github.com/wagslane/go-rabbitmq"
+	"gorm.io/gorm"
 )
 
 type Config struct {
-	mb *broker.MessageBroker
-	db *database.Database
-
-	rawExchange       string
-	processedExchange string
-	rawQueue          string
-	processedQueue    string
+	options *Options
+	db      *gorm.DB
+	broker  *rabbitmq.Conn
 }
 
-func NewConfig() (*Config, error) {
+func NewConfig(ctx *cli.Context) (*Config, error) {
 	c := &Config{
-		rawExchange:       rawExchange,
-		processedExchange: processedExchange,
-		rawQueue:          rawQueue,
-		processedQueue:    processedQueue,
+		options: NewOptions(ctx),
 	}
 
-	mbConfig := broker.NewConfig(mbUser, mbPassword, mbServer)
-
-	mb, err := broker.NewMessageBroker(mbConfig)
-	if err != nil {
+	if err := c.connectBroker(); err != nil {
 		return nil, err
 	}
 
-	c.mb = mb
-
-	dbConfig := database.NewConfig(dbUser, dbPassword, dbServer, dbName, dbTimeout)
-
-	db, err := database.NewDatabase(dbConfig)
-	if err != nil {
-		c.shutdownMessageBroker()
+	if err := c.connectDb(); err != nil {
+		c.shutdownBroker()
 		return nil, err
 	}
-
-	c.db = db
-
-	log.Debug("config: successfully initialized")
+	log.Info("config: successfully initialized")
 
 	return c, nil
 }
 
 func (c *Config) Shutdown() {
-	c.shutdownMessageBroker()
+	c.shutdownBroker()
 
-	if err := c.db.Close(); err != nil {
+	if err := c.closeDb(); err != nil {
 		log.Errorf("could not close database connection: %s", err)
 	} else {
-		log.Debug("closed database connection")
+		log.Info("closed database connection")
 	}
 }
 
-func (c *Config) shutdownMessageBroker() {
-	if err := c.mb.Close(); err != nil {
+func (c *Config) shutdownBroker() {
+	if err := c.closeBroker(); err != nil {
 		log.Errorf("could not close message broker connection: %s", err)
 	} else {
-		log.Debug("closed message broker connection")
+		log.Info("closed message broker connection")
 	}
 }

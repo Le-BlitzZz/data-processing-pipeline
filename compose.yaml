@@ -3,7 +3,7 @@ services:
     build: .
     depends_on:
       - rabbitmq
-    working_dir: "/go/src/github.com/Le-BlitzZz/streaming-etl-app"
+    working_dir: "/go/src/github.com/Le-BlitzZz/streaming-etl-app/"
     volumes:
       - "./:/go/src/github.com/Le-BlitzZz/streaming-etl-app"
       - "go-mod:/go/pkg/mod"
@@ -13,21 +13,33 @@ services:
     depends_on:
       - rabbitmq
       - mariadb
-    working_dir: "/go/src/github.com/Le-BlitzZz/streaming-etl-app"
+    ports:
+    - "8080:8080" # HTTP ports
+    working_dir: "/go/src/github.com/Le-BlitzZz/streaming-etl-app/"
     volumes:
       - "./:/go/src/github.com/Le-BlitzZz/streaming-etl-app"
       - "go-mod:/go/pkg/mod"
 
-  presenter:
-    build: .
+  processor:
+    build:
+      context: .
+      dockerfile: processor/Dockerfile
     depends_on:
-      - mariadb
-    ports:
-      - "8080:8080" # HTTP ports
-    working_dir: "/go/src/github.com/Le-BlitzZz/streaming-etl-app"
+      - rabbitmq
+    working_dir: "/app"
     volumes:
-      - "./:/go/src/github.com/Le-BlitzZz/streaming-etl-app"
-      - "go-mod:/go/pkg/mod"
+      - "./processor:/app"
+
+  # presenter:
+  #   build: .
+  #   depends_on:
+  #     - mariadb
+  #   ports:
+  #     - "8081:8081" # HTTP ports
+  #   working_dir: "/go/src/github.com/Le-BlitzZz/streaming-etl-app/"
+  #   volumes:
+  #     - "./:/go/src/github.com/Le-BlitzZz/streaming-etl-app"
+  #     - "go-mod:/go/pkg/mod"
       
   rabbitmq:
     image: rabbitmq:3-management

@@ -4,15 +4,18 @@ up:
 down:
 	docker compose down
 
+up-fresh:
+	docker compose up --build
+
 clean:
 	docker compose down --volumes
 
 start-producer:
-	./build/producer
+	./bin/producer
 start-uploader:
-	./build/uploader
+	./bin/uploader
 start-presenter:
-	./build/presenter
+	./bin/presenter
 
 terminal-producer:
 	docker compose exec -u root producer bash
@@ -25,14 +28,14 @@ terminal-presenter:
 
 build: build-producer build-uploader build-presenter
 build-producer:
-	rm -rf ./build/producer
-	go build -o ./build/producer cmd/producer/producer.go
+	rm -rf ./bin/producer
+	go build -o ./bin/producer cmd/producer/producer.go
 build-uploader:
-	rm -rf ./build/uploader
-	go build -o ./build/uploader cmd/uploader/uploader.go
+	rm -rf ./bin/uploader
+	go build -o ./bin/uploader cmd/uploader/uploader.go
 build-presenter:
-	rm -rf ./build/presenter
-	go build -o ./build/presenter cmd/presenter/presenter.go
+	rm -rf ./bin/presenter
+	go build -o ./bin/presenter cmd/presenter/presenter.go
 
 fmt:
 	go mod tidy

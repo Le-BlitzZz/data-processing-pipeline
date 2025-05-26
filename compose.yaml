@@ -1,5 +1,5 @@
 services:
-  producer:
+  publisher:
     build: .
     depends_on:
       - rabbitmq
@@ -8,7 +8,7 @@ services:
       - "./:/go/src/github.com/Le-BlitzZz/streaming-etl-app"
       - "go-mod:/go/pkg/mod"
 
-  uploader:
+  dataserver:
     build: .
     depends_on:
       - rabbitmq
@@ -23,24 +23,14 @@ services:
   processor:
     build:
       context: .
-      dockerfile: processor/Dockerfile
+      dockerfile: services/processor/Dockerfile
     depends_on:
       - rabbitmq
-    working_dir: "/app"
+    working_dir: "/go/src/github.com/Le-BlitzZz/streaming-etl-app/"
     volumes:
-      - "./processor:/app"
+      - "./:/go/src/github.com/Le-BlitzZz/streaming-etl-app"
+      # - "./services/processor:/app"
 
-  # presenter:
-  #   build: .
-  #   depends_on:
-  #     - mariadb
-  #   ports:
-  #     - "8081:8081" # HTTP ports
-  #   working_dir: "/go/src/github.com/Le-BlitzZz/streaming-etl-app/"
-  #   volumes:
-  #     - "./:/go/src/github.com/Le-BlitzZz/streaming-etl-app"
-  #     - "go-mod:/go/pkg/mod"
-      
   rabbitmq:
     image: rabbitmq:3-management
     ports:

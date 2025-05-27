@@ -6,7 +6,7 @@ from aio_pika import (
 )
 
 import processor.config as config
-from processor.transformation import transform
+from processor.transform import transform
 
 
 async def run(conn):

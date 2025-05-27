@@ -1,5 +1,6 @@
 import logging
 from aio_pika import connect_robust
+from pathlib import Path
 
 BROKER_SERVER = "rabbitmq:5672"
 BROKER_USER = "etlstream"
@@ -11,6 +12,10 @@ BROKER_PROCESSED_EXCHANGE = "processed_exchange"
 BROKER_RAW_PROCESSING_QUEUE = "raw_processing_queue"
 
 BATCH_SIZE = 11_986
+
+HERE = Path(__file__).resolve().parent
+PROJECT_ROOT = HERE.parents[3]
+PREPROCESSOR_PATH = PROJECT_ROOT / "models" / "preprocessor.joblib"
 
 
 async def new_broker():

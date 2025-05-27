@@ -1,19 +1,15 @@
 [tool.poetry]
-name = "processor"
+name = "transformation"
 version = "0.1.0"
 description = ""
 authors = ["Le-BlitzZz"]
 license = "MIT"
 
+packages = [{ include = "transformation", from = "src" }]
+
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
-pandas = ">=2.2.3,<3.0.0"
-aio-pika = ">=9.5.5,<10.0.0"
 scikit-learn = "^1.6.1"
-transformation = { path = "../../libs/transformation", develop = true }
-
-[tool.poetry.scripts]
-processor = "processor.main:main"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

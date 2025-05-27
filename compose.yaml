@@ -29,7 +29,16 @@ services:
     working_dir: "/go/src/github.com/Le-BlitzZz/streaming-etl-app/"
     volumes:
       - "./:/go/src/github.com/Le-BlitzZz/streaming-etl-app"
-      # - "./services/processor:/app"
+
+  trainer:
+    build:
+      context: .
+      dockerfile: services/trainer/Dockerfile
+    depends_on:
+      - rabbitmq
+    working_dir: "/go/src/github.com/Le-BlitzZz/streaming-etl-app/"
+    volumes:
+      - "./:/go/src/github.com/Le-BlitzZz/streaming-etl-app"
 
   rabbitmq:
     image: rabbitmq:3-management

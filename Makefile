@@ -16,6 +16,8 @@ start-dataserver:
 	./bin/dataserver
 start-processor:
 	cd services/processor && poetry run processor
+start-trainer:
+	cd services/trainer && poetry run trainer
 
 
 terminal-publisher:
@@ -24,6 +26,8 @@ terminal-dataserver:
 	docker compose exec -u root dataserver bash
 terminal-processor:
 	docker compose exec -u root processor bash
+terminal-trainer:
+	docker compose exec -u root trainer bash
 
 build: build-publisher build-dataserver
 build-publisher:
@@ -34,6 +38,8 @@ build-dataserver:
 	go build -o ./bin/dataserver cmd/dataserver/dataserver.go
 build-processor:
 	cd services/processor && poetry install
+build-trainer:
+	cd services/trainer && poetry install
 
 fmt:
 	go mod tidy

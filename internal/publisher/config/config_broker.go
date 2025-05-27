@@ -53,7 +53,7 @@ func (c *Config) BrokerRawExchange() string {
 	return c.options.BrokerRawExchange
 }
 
-func (c *Config) BrokerProcessedExchange() string {
+func (c *Config) BrokerRawProcessingExchange() string {
 	if c.options.BrokerRawProcessingExchange == "" {
 		return brokerRawProcessingExchange
 	}

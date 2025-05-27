@@ -13,17 +13,17 @@ async def run(conn):
     channel = await conn.channel()
     await channel.set_qos(prefetch_count=os.cpu_count())
 
-    raw_ex = await channel.declare_exchange(
+    raw_processing_exchange = await channel.declare_exchange(
         config.BROKER_RAW_PROCESSING_EXCHANGE, ExchangeType.FANOUT, durable=True
     )
-    proc_ex = await channel.declare_exchange(
+    processed_exchange = await channel.declare_exchange(
         config.BROKER_PROCESSED_EXCHANGE, ExchangeType.FANOUT, durable=True
     )
 
     queue = await channel.declare_queue(
         config.BROKER_RAW_PROCESSING_QUEUE, durable=True
     )
-    await queue.bind(raw_ex)
+    await queue.bind(raw_processing_exchange)
 
     rows = []
     batch_ready = asyncio.Event()
@@ -39,7 +39,7 @@ async def run(conn):
 
     await batch_ready.wait()
 
-    await _process_and_publish(proc_ex, rows)
+    await _process_and_publish(processed_exchange, rows)
 
     await queue.cancel(consumer_tag)
     await channel.close()

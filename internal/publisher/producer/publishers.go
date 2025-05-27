@@ -11,11 +11,11 @@ import (
 )
 
 var rawPublisher *rabbitmq.Publisher
-var processedPublisher *rabbitmq.Publisher
+var rawProcessingPublisher *rabbitmq.Publisher
 
-func runPublishers(rawExchange, processedExchange string) {
+func runPublishers(rawExchange, rawProcessingExchange string) {
 	var rawCount int64
-	var processedCount int64
+	var rawProcessingCount int64
 
 	var wg sync.WaitGroup
 
@@ -32,10 +32,10 @@ func runPublishers(rawExchange, processedExchange string) {
 					atomic.AddInt64(&rawCount, 1)
 				}
 
-				if err := publishPayload(processedPublisher, payload, processedExchange); err != nil {
+				if err := publishPayload(rawProcessingPublisher, payload, rawProcessingExchange); err != nil {
 					log.Errorf("failed to publish payload: %s", err)
 				} else {
-					atomic.AddInt64(&processedCount, 1)
+					atomic.AddInt64(&rawProcessingCount, 1)
 				}
 			}
 		}()
@@ -43,7 +43,7 @@ func runPublishers(rawExchange, processedExchange string) {
 
 	wg.Wait()
 
-	log.Infof("all payloads published: raw=%d processed=%d", rawCount, processedCount)
+	log.Infof("all payloads published: raw=%d rawProcessing=%d", rawCount, rawProcessingCount)
 }
 
 func newPublisher(broker *rabbitmq.Conn, exchange string) (*rabbitmq.Publisher, error) {
@@ -76,7 +76,7 @@ func shutdownRawPublisher() {
 func shutdownProcessedPublisher() {
 	log.Info("shutting down processed publisher")
 
-	if processedPublisher != nil {
-		processedPublisher.Close()
+	if rawProcessingPublisher != nil {
+		rawProcessingPublisher.Close()
 	}
 }

@@ -20,7 +20,7 @@ func Run(conf *config.Config) {
 	}
 	defer shutdownRawPublisher()
 
-	processedPublisher, err = newPublisher(broker, conf.BrokerProcessedExchange())
+	rawProcessingPublisher, err = newPublisher(broker, conf.BrokerRawProcessingExchange())
 	if err != nil {
 		log.Panicf("failed to create publisher for processing raw messages: %s", err)
 	}
@@ -28,7 +28,7 @@ func Run(conf *config.Config) {
 
 	go streamPayloadsFromCSVs(conf.DataSplitPathMap())
 
-	runPublishers(conf.BrokerRawExchange(), conf.BrokerProcessedExchange())
+	runPublishers(conf.BrokerRawExchange(), conf.BrokerRawProcessingExchange())
 
 	log.Infof("stream and publish work finished in [%s]", time.Since(start))
 }

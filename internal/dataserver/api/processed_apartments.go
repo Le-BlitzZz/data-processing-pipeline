@@ -13,10 +13,10 @@ import (
 )
 
 func GetProcessedApartment(router *gin.RouterGroup) {
-	router.GET("/processed-apartment/:uid", func(c *gin.Context) {
-		if a := entity.FindProcessedApartment(c.Param("uid")); a == nil {
+	router.GET("/processed-apartment/:uuid", func(c *gin.Context) {
+		if a := entity.FindProcessedApartment(c.Param("uuid")); a == nil {
 			c.JSON(http.StatusNotFound, gin.H{
-				"error": fmt.Sprintf("ProcessedApartment with UUID %s not found", c.Param("uid")),
+				"error": fmt.Sprintf("ProcessedApartment with UUID %s not found", c.Param("uuid")),
 			})
 		} else {
 			c.JSON(http.StatusOK, a)

@@ -9,9 +9,9 @@ import (
 var API *gin.RouterGroup
 
 func registerRoutes() {
-	api.GetProcessedApartment(API)
+	api.GetRawApartment(API)
 	api.SearchRawApartments(API)
 
-	// api.GetProcessedApartment(API)
-	// api.SearchProcessedApartments(API)
+	api.GetProcessedApartment(API)
+	api.SearchProcessedApartments(API)
 }

@@ -13,10 +13,10 @@ import (
 )
 
 func GetRawApartment(router *gin.RouterGroup) {
-	router.GET("/raw-apartment/:uid", func(c *gin.Context) {
-		if a := entity.FindRawApartment(c.Param("uid")); a == nil {
+	router.GET("/raw-apartment/:uuid", func(c *gin.Context) {
+		if a := entity.FindRawApartment(c.Param("uuid")); a == nil {
 			c.JSON(http.StatusNotFound, gin.H{
-				"error": fmt.Sprintf("RawApartment with UUID %s not found", c.Param("uid")),
+				"error": fmt.Sprintf("RawApartment with UUID %s not found", c.Param("uuid")),
 			})
 		} else {
 			c.JSON(http.StatusOK, a)
@@ -51,7 +51,6 @@ func SearchRawApartments(router *gin.RouterGroup) {
 		AddExpectedCountHeader(c)
 		AddLoadedCountHeader(c, entity.RawApartmentsCount())
 		AddFilteredCountHeader(c, len(result))
-
 
 		c.JSON(http.StatusOK, result)
 	})
